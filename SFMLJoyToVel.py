@@ -40,6 +40,10 @@ module_spec = ["implementation_id", "SFMLJoyToVel",
 		 "max_instance",      "1", 
 		 "language",          "Python", 
 		 "lang_type",         "SCRIPT",
+	         "conf.default.vxGain", "0.01",
+	         "conf.default.vaGain", "0.01",
+                 "conf.default.vxIndex", "0",
+	         "conf.default.vaIndex", "1",
 		 ""]
 # </rtc-template>
 
@@ -73,6 +77,12 @@ class SFMLJoyToVel(OpenRTM_aist.DataFlowComponentBase):
 
 		# initialize of configuration-data.
 		# <rtc-template block="init_conf_param">
+
+		self._vxIndex = [0]
+		self._vaIndex = [1]
+		self._vxGain  = [0.01]
+		self._vaGain  = [0.01]
+
 		
 		# </rtc-template>
 
@@ -108,6 +118,10 @@ class SFMLJoyToVel(OpenRTM_aist.DataFlowComponentBase):
 		
 		# Set CORBA Service Ports
 
+		self.bindParameter("vxIndex", self._vxIndex, "0")
+		self.bindParameter("vaIndex", self._vaIndex, "1")
+		self.bindParameter("vxGain", self._vxGain, "0.01")
+		self.bindParameter("vaGain", self._vaGain, "0.01")
 		
 		return RTC.RTC_OK
 	
@@ -198,7 +212,11 @@ class SFMLJoyToVel(OpenRTM_aist.DataFlowComponentBase):
 		
 		if self._inIn.isNew():
 			val = self._inIn.read()
-			print val.data
+			self._d_out.data.vx = self._vxGain[0] * val.data[self._vxIndex[0]]
+			self._d_out.data.vy = 0 # self._vxGain[0] * val.data[self._vxIndex[0]]
+			self._d_out.data.va = self._vaGain[0] * val.data[self._vaIndex[0]]
+			self._outOut.write()
+			
 		return RTC.RTC_OK
 	
 	#	##
